@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Flour Inspection Builder">
+    <meta name="application-name" content="Flour Inspection Report Builder">
+    <meta name="description" content="Daily Flour Supply Verification & Photographic Audit App for District Sheikhupura.">
+    <title>Flour Inspection Report Builder</title>
+
+    <!-- Embedded Web App Manifest for Instant PWABuilder & GitHub Pages Compatibility -->
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiRmxvdXIgSW5zcGVjdGlvbiBSZXBvcnQgQnVpbGRlciIsInNob3J0X25hbWUiOiJGbG91clJlcG9ydCIsImRlc2NyaXB0aW9uIjoiRGFpbHkgRmxvdXIgU3VwcGx5IFZlcmlmaWNhdGlvbiAmIFBob3RvZ3JhcGhpYyBBdWRpdCBBcHAgZm9yIERpc3RyaWN0IFNoZWlraHVwdXJhLiIsInN0YXJ0X3VybCI6Ii4vIiwic2NvcGUiOiIuLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZjE3MmEiLCJ0aGVtZV9jb2xvciI6IiMwZjE3MmEiLCJvcmllbnRhdGlvbiI6InBvcnRyYWl0IiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDt1dGY4LDxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgNTEyIDUxMic+PHJlY3Qgd2lkdGg9JzUxMicgaGVpZ2h0PSc1MTInIHJ4PScxMjAnIGZpbGw9JyUwZjE3MmEnLz48Y2lyY2xlIGN4PScyNTY meT0nMjU2JyByPScxODAnIGZpbGw9JyUxNmE0NGEnLz48cGF0aCBmaWxsPSclZmZmZmZmJyBkPSdNMjU2IDEyMGMtNzUuMSAwLTEzNiA2MC45LTEzNiAxMzZzNjAuOSAxMzYgMTM2IDEzNiAxMzYtNjAuOSAxMzYtMTM2UzMzMS4xIDEyMCAyNTYgMTIwem0wIDIzMmMtNTMgMC05Ni00My05Ni05NnM0My05NiA5Ni05NiA5NiA0MyA5NiA5Ni00MyA5Ni05NiA5NnoJLz48L3N2Zz4iLCJzaXplcyI6IjE5MngxOTIgNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIiwicHVycG9zZSI6ImFueSBtYXNrYWJsZSJ9XX0=">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- html2pdf.js for Client-Side PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 14mm 16mm;
+            margin: 0 auto;
+            background: #ffffff;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                padding: 0 !important;
+            }
+            .a4-page {
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 100% !important;
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-500 selection:text-white">
+
+    <div class="flex-1 flex flex-col max-w-7xl w-full mx-auto shadow-2xl bg-slate-900 border-x border-slate-800 min-h-screen">
+        
+        <header class="bg-slate-800 border-b border-slate-700 px-4 py-3 flex items-center justify-between no-print">
+            <div class="flex items-center gap-3">
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold text-white tracking-wide leading-tight">Flour Inspection Report Builder</h1>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-700/80">
+                    <button onclick="switchTab('editor')" id="tab-btn-editor" class="text-xs px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 bg-brand-600 text-white shadow">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span>Photos</span>
+                    </button>
+                    <button onclick="switchTab('preview')" id="tab-btn-preview" class="text-xs px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <span>Preview PDF</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+            
+            <div id="editor-panel" class="w-full flex-1 border-b lg:border-b-0 border-slate-800 flex flex-col bg-slate-900/50 overflow-y-auto custom-scrollbar p-4 gap-4 no-print">
+                
+                <div id="toast-message" class="hidden p-3 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs rounded-xl flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+                    <span id="toast-text">Operation completed successfully.</span>
+                </div>
+
+                <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700/60 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-grip text-brand-400 text-sm"></i>
+                        <label for="input-grid" class="text-xs font-semibold text-slate-200">Photo Grid Layout:</label>
+                    </div>
+                    <select id="input-grid" onchange="updateReportView()" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-brand-500">
+                        <option value="2">2 Photos / Row (Standard)</option>
+                        <option value="3">3 Photos / Row (Compact)</option>
+                        <option value="1">1 Photo / Row (Large Detail)</option>
+                    </select>
+                </div>
+
+                <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700/60 space-y-3 flex-1 flex flex-col">
+                    <div class="flex items-center justify-between border-b border-slate-700/60 pb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-brand-500 flex items-center gap-1.5">
+                            <i class="fa-solid fa-images"></i> Inspection Photos
+                        </span>
+                    </div>
+
+                    <label for="image-input" class="border-2 border-dashed border-slate-600 hover:border-brand-500 bg-slate-900/60 hover:bg-slate-900 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition group">
+                        <div class="w-10 h-10 rounded-full bg-slate-800 group-hover:bg-brand-600/20 text-brand-400 flex items-center justify-center mb-2 transition">
+                            <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                        </div>
+                        <p class="text-xs font-medium text-slate-200">Tap to select WhatsApp photos</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Supports JPG, PNG, WEBP (Multiple selection)</p>
+                        <input type="file" id="image-input" multiple accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+                    </label>
+
+                    <div id="image-queue" class="flex-1 min-h-[160px] max-h-[280px] overflow-y-auto custom-scrollbar space-y-2 pr-1">
+                        <div id="empty-state" class="h-full flex flex-col items-center justify-center text-slate-500 py-8 text-center">
+                            <i class="fa-solid fa-camera-retro text-3xl mb-2 opacity-40"></i>
+                            <p class="text-xs">No WhatsApp photos added yet.</p>
+                            <p class="text-[11px] text-slate-600 mt-1">Tap above to select photos from device</p>
+                        </div>
+                    </div>
+
+                    <button onclick="clearAllPhotos()" id="btn-clear-all" class="hidden w-full py-1.5 text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition border border-rose-500/20 flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-trash-can"></i> Clear All Images
+                    </button>
+                </div>
+
+                <div class="pt-1 flex gap-2">
+                    <button onclick="generatePDF()" class="flex-1 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        <i class="fa-solid fa-file-pdf text-lg"></i>
+                        <span>Export PDF Report</span>
+                    </button>
+                    <button onclick="simulateWhatsAppShare()" class="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 p-3 rounded-xl transition flex items-center justify-center" title="Quick Share to WhatsApp">
+                        <i class="fa-brands fa-whatsapp text-xl"></i>
+                    </button>
+                </div>
+
+            </div>
+
+            <div id="preview-panel" class="hidden w-full bg-slate-950 flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col items-center">
+                
+                <div class="w-full max-w-[210mm] flex items-center justify-end mb-3 text-xs text-slate-400 no-print">
+                    <div class="flex items-center gap-2">
+                        <button onclick="switchTab('editor')" class="hover:text-white px-2.5 py-1 rounded bg-slate-800 border border-slate-700 flex items-center gap-1.5 text-slate-300">
+                            <i class="fa-solid fa-arrow-left"></i> Back to Photos
+                        </button>
+                        <button onclick="window.print()" class="hover:text-white px-2.5 py-1 rounded bg-slate-800 border border-slate-700 flex items-center gap-1.5 text-slate-300">
+                            <i class="fa-solid fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+
+                <div id="pdf-content" class="w-full max-w-[210mm] text-slate-800 text-left space-y-6">
+                    
+                    <!-- PAGE 1: COVER PAGE -->
+                    <div class="a4-page relative flex flex-col justify-between bg-white border-[10px] border-slate-900 p-10 shadow-2xl overflow-hidden" style="page-break-after: always; min-height: 297mm;">
+                        <div class="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-slate-100 opacity-60 pointer-events-none flex items-center justify-center">
+                            <i class="fa-solid fa-wheat-awn text-[180px] text-slate-200"></i>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between border-b-2 border-slate-900 pb-5">
+                                <div>
+                                    <h3 class="text-xs font-black uppercase tracking-widest text-slate-500">Government of Punjab</h3>
+                                    <h2 class="text-base font-extrabold text-slate-900 tracking-tight uppercase leading-snug">Directorate General of Food</h2>
+                                    <p class="text-[11px] font-semibold text-teal-700">Food Safety & Consumer Protection Department</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="inline-block px-3 py-1 bg-slate-900 text-white rounded text-[10px] font-bold uppercase tracking-widest" id="cover-ref-id">
+                                        REF: FLR-2026-0919
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="h-1.5 w-full bg-gradient-to-r from-slate-900 via-brand-600 to-emerald-600 my-8 rounded-full"></div>
+
+                            <div class="my-10 bg-slate-50/80 border-y-2 border-slate-900 p-8 rounded-r-2xl border-l-8 border-l-emerald-700 shadow-sm relative">
+                                <div class="space-y-2">
+                                    <h1 class="text-3xl font-black text-slate-900 uppercase tracking-tight leading-tight">
+                                        Flour Supply Verification Report
+                                    </h1>
+                                    <h2 class="text-xl font-extrabold text-emerald-800 uppercase tracking-wider">
+                                        District Sheikhupura
+                                    </h2>
+                                    <p class="text-xs font-bold text-slate-600 uppercase tracking-widest pt-1">
+                                        Daily Physical Inspection, Stock Monitoring & Photographic Audit
+                                    </p>
+                                </div>
+
+                                <div class="mt-8 pt-6 border-t border-slate-300/80 flex flex-wrap items-center justify-between gap-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-emerald-900 text-amber-400 flex items-center justify-center text-lg shadow-sm">
+                                            <i class="fa-solid fa-calendar-days"></i>
+                                        </div>
+                                        <div>
+                                            <span class="text-[10px] uppercase font-extrabold tracking-widest text-slate-500 block">Date of Physical Inspection</span>
+                                            <span class="text-base font-black text-slate-900 uppercase tracking-wide" id="cover-date-stamp">SEPTEMBER 19, 2026</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white px-3.5 py-2 rounded-md border border-slate-300 text-right shadow-xs flex items-center justify-center">
+                                        <span class="text-xs font-black text-slate-800 uppercase">Sheikhupura, Punjab</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-6 border-t-2 border-slate-300 flex justify-between items-end relative z-10">
+                            <div class="text-[10px] text-slate-600 space-y-0.5">
+                                <p class="font-bold text-slate-900 text-xs">Food Safety & Consumer Protection Department</p>
+                                <p class="font-semibold text-slate-700">Directorate General of Food</p>
+                                <p class="text-slate-500">Government of Punjab</p>
+                            </div>
+
+                            <div class="text-right">
+                                <p class="font-bold text-slate-900 text-xs uppercase tracking-wider">District Food Controller</p>
+                                <p class="text-[10px] font-semibold text-slate-600">Sheikhupura</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAGE 2: PHOTOGRAPHIC EVIDENCE PAGE -->
+                    <div class="a4-page relative flex flex-col justify-between bg-white p-10 shadow-2xl" style="min-height: 297mm;">
+                        <div>
+                            <div class="border-b-2 border-slate-800 pb-3 mb-6 flex justify-between items-start">
+                                <div>
+                                    <h2 class="text-base font-black uppercase tracking-wider text-slate-900 leading-tight">Flour Supply Verification</h2>
+                                    <p class="text-xs font-semibold text-slate-600 mt-0.5">District Sheikhupura</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="inline-block px-2.5 py-1 bg-slate-100 border border-slate-300 rounded text-[10px] font-bold text-slate-800 uppercase tracking-widest" id="report-id-code">
+                                        REF: FLR-2026-0919
+                                    </span>
+                                    <p class="text-[10px] text-slate-500 mt-1" id="report-date-str">Date: Sep 19, 2026</p>
+                                </div>
+                            </div>
+
+                            <div id="preview-grid" class="grid grid-cols-2 gap-3 mb-6">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <footer class="w-full max-w-6xl text-center py-2 text-xs text-slate-400 font-medium tracking-wide no-print flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-code text-brand-400 text-[10px]"></i>
+        <span>Developed by <strong class="text-slate-200 font-semibold">Asad Raza Virk</strong></span>
+    </footer>
+
+    <div id="whatsapp-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md p-5 text-center shadow-2xl space-y-4">
+            <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto text-2xl">
+                <i class="fa-brands fa-whatsapp"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-white">Share Report via WhatsApp</h3>
+                <p class="text-xs text-slate-400 mt-1">Ready to attach PDF report to your WhatsApp group.</p>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 text-left text-xs font-mono text-slate-300 flex items-center gap-3">
+                <i class="fa-solid fa-file-pdf text-rose-400 text-xl"></i>
+                <div class="overflow-hidden">
+                    <p class="truncate font-semibold text-white" id="modal-filename">Flour_Inspection_Report_20260919.pdf</p>
+                    <p class="text-[10px] text-slate-400">PDF Document • Standard Format</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeModal()" class="flex-1 py-2 text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg transition">Close</button>
+                <button onclick="triggerDownloadAndNotify()" class="flex-1 py-2 text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg shadow transition">
+                    Download & Open WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedImages = [];
+
+        const defaultCaptions = [
+            "Flour Stock Inventory & Bag Stack Verification at Flour Mills",
+            "20kg / 10kg Bag Packaging, Stamping & Bag Weight Spot Check",
+            "Dispatch Truck Loading",
+            "Retail Point Supply Verification"
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            const coverDateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase();
+            
+            document.getElementById('report-date-str').innerText = `Date: ${dateStr}`;
+            document.getElementById('cover-date-stamp').innerText = coverDateStr;
+            
+            const refNum = Math.floor(1000 + Math.random() * 9000);
+            const refCode = `REF: FLR-${now.getFullYear()}-${refNum}`;
+            document.getElementById('report-id-code').innerText = refCode;
+            document.getElementById('cover-ref-id').innerText = refCode;
+
+            updateReportView();
+        });
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            Array.from(files).forEach((file) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const captionText = defaultCaptions[uploadedImages.length % defaultCaptions.length];
+                    uploadedImages.push({
+                        url: e.target.result,
+                        caption: captionText
+                    });
+                    renderPhotoList();
+                    updateReportView();
+                };
+                reader.readAsDataURL(file);
+            });
+
+            showToast(`${files.length} photo(s) added successfully.`);
+        }
+
+        function renderPhotoList() {
+            const queueContainer = document.getElementById('image-queue');
+            const clearBtn = document.getElementById('btn-clear-all');
+
+            if (uploadedImages.length === 0) {
+                queueContainer.innerHTML = `
+                    <div id="empty-state" class="h-full flex flex-col items-center justify-center text-slate-500 py-8 text-center">
+                        <i class="fa-solid fa-camera-retro text-3xl mb-2 opacity-40"></i>
+                        <p class="text-xs">No WhatsApp photos added yet.</p>
+                        <p class="text-[11px] text-slate-600 mt-1">Tap above to select photos from device</p>
+                    </div>`;
+                clearBtn.classList.add('hidden');
+                return;
+            }
+
+            clearBtn.classList.remove('hidden');
+
+            queueContainer.innerHTML = uploadedImages.map((item, index) => `
+                <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-2 flex items-center gap-2.5 group">
+                    <img src="${item.url}" class="w-12 h-12 rounded-lg object-cover bg-slate-800 border border-slate-700" alt="Inspection photo thumbnail">
+                    <div class="flex-1 min-w-0">
+                        <input type="text" value="${item.caption}" oninput="updateCaption(${index}, this.value)" 
+                            class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-0.5 text-xs text-slate-200 focus:outline-none focus:border-brand-500">
+                        <span class="text-[10px] text-slate-500 mt-0.5 block">Position: #${index + 1}</span>
+                    </div>
+                    <button onclick="removePhoto(${index})" class="text-slate-500 hover:text-rose-400 p-1.5 transition" title="Remove photo">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function updateCaption(index, val) {
+            uploadedImages[index].caption = val;
+            updateReportView();
+        }
+
+        function removePhoto(index) {
+            uploadedImages.splice(index, 1);
+            renderPhotoList();
+            updateReportView();
+            showToast('Photo removed.');
+        }
+
+        function clearAllPhotos() {
+            uploadedImages = [];
+            renderPhotoList();
+            updateReportView();
+            showToast('All photos cleared.');
+        }
+
+        function updateReportView() {
+            const cols = document.getElementById('input-grid').value;
+            const gridContainer = document.getElementById('preview-grid');
+
+            gridContainer.className = `grid grid-cols-${cols} gap-3 mb-6`;
+
+            if (uploadedImages.length === 0) {
+                gridContainer.innerHTML = `
+                    <div class="col-span-full border-2 border-dashed border-slate-300 rounded-xl p-8 text-center text-slate-400">
+                        <i class="fa-regular fa-image text-2xl mb-1"></i>
+                        <p class="text-xs font-medium">No inspection photos attached.</p>
+                        <p class="text-[10px] text-slate-400">Upload WhatsApp images on the left control panel.</p>
+                    </div>`;
+                return;
+            }
+
+            gridContainer.innerHTML = uploadedImages.map((img, idx) => `
+                <div class="border border-slate-200 rounded-lg p-1.5 bg-white shadow-sm flex flex-col">
+                    <div class="relative overflow-hidden rounded bg-slate-100 aspect-square mb-1.5">
+                        <img src="${img.url}" class="w-full h-full object-cover" alt="Inspection evidence photo">
+                        <span class="absolute top-1 left-1 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded backdrop-blur-sm">
+                            #${idx + 1}
+                        </span>
+                    </div>
+                    <p class="text-[10px] font-semibold text-slate-700 leading-tight px-0.5 truncate">${img.caption}</p>
+                </div>
+            `).join('');
+        }
+
+        function generatePDF() {
+            if (uploadedImages.length === 0) {
+                showToast('Please add at least one photo before generating PDF.');
+                return;
+            }
+
+            showToast('Compiling multi-page PDF report document...');
+
+            const element = document.getElementById('pdf-content');
+            const opt = {
+                margin:       0,
+                filename:     `Flour_Verification_Report_Sheikhupura_${new Date().toISOString().slice(0,10)}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['css', 'legacy'] }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                showToast('PDF Report downloaded successfully!');
+            });
+        }
+
+        function simulateWhatsAppShare() {
+            if (uploadedImages.length === 0) {
+                showToast('Please add photos first.');
+                return;
+            }
+            const modal = document.getElementById('whatsapp-modal');
+            const filenameStr = `Flour_Verification_Report_Sheikhupura_${new Date().toISOString().slice(0,10)}.pdf`;
+            document.getElementById('modal-filename').innerText = filenameStr;
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('whatsapp-modal').classList.add('hidden');
+        }
+
+        function triggerDownloadAndNotify() {
+            closeModal();
+            generatePDF();
+            setTimeout(() => {
+                showToast('Opening WhatsApp share target...');
+            }, 1200);
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById('toast-message');
+            const toastText = document.getElementById('toast-text');
+            toastText.innerText = text;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3500);
+        }
+
+        function switchTab(tab) {
+            const editor = document.getElementById('editor-panel');
+            const preview = document.getElementById('preview-panel');
+            const btnEditor = document.getElementById('tab-btn-editor');
+            const btnPreview = document.getElementById('tab-btn-preview');
+
+            if (tab === 'preview') {
+                editor.classList.add('hidden');
+                preview.classList.remove('hidden');
+                
+                btnPreview.className = "text-xs px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 bg-brand-600 text-white shadow";
+                btnEditor.className = "text-xs px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white";
+                
+                showToast('Switched to PDF Preview.');
+            } else {
+                preview.classList.add('hidden');
+                editor.classList.remove('hidden');
+                
+                btnEditor.className = "text-xs px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 bg-brand-600 text-white shadow";
+                btnPreview.className = "text-xs px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white";
+            }
+        }
+    </script>
+</body>
+</html>
